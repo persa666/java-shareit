@@ -3,8 +3,8 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,11 +18,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getAllUsers() {
-        List<UserDto> users = new ArrayList<>();
-        for (User elem : userStorage.getAllUsers()) {
-            users.add(UserMapper.toUserDto(elem));
-        }
-        return users;
+        return userStorage.getAllUsers()
+                .stream()
+                .map(UserMapper::toUserDto)
+                .collect(Collectors.toList());
     }
 
     @Override

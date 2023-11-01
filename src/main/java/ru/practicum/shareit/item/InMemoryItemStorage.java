@@ -6,10 +6,11 @@ import ru.practicum.shareit.exp.NonExistentItemException;
 import ru.practicum.shareit.exp.NonExistentUserException;
 import ru.practicum.shareit.user.UserStorage;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -29,7 +30,7 @@ public class InMemoryItemStorage implements ItemStorage {
 
     @Override
     public Item replaceItem(ItemDto itemDto, int userId, int itemId) {
-        Item oldItem = checkItem(itemId);
+        Item oldItem = getItemById(userId, itemId);
         if (oldItem.getOwner().getId() != userId) {
             throw new NonExistentUserException("Пользователь не является владельцем вещи.");
         }
@@ -48,37 +49,26 @@ public class InMemoryItemStorage implements ItemStorage {
 
     @Override
     public Item getItemById(int userId, int itemId) {
-        return checkItem(itemId);
+        return Optional.ofNullable(items.get(itemId))
+                .orElseThrow(() -> new NonExistentItemException("Вещь с таким id не найдена."));
     }
 
     @Override
     public List<ItemDto> getItemsOwnerById(int userId) {
-        List<ItemDto> itemsUser = new ArrayList<>();
-        for (Item elem : items.values()) {
-            if (elem.getOwner().getId() == userId) {
-                itemsUser.add(ItemMapper.toItemDto(elem));
-            }
-        }
-        return itemsUser;
+        return items.values()
+                .stream()
+                .filter(x -> x.getOwner().getId() == userId)
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<ItemDto> getItemBySearch(int userId, String text) {
-        List<ItemDto> itemsBySearch = new ArrayList<>();
-        for (Item elem : items.values()) {
-            if ((elem.getName().toLowerCase().contains(text.toLowerCase()) ||
-                    elem.getDescription().toLowerCase().contains(text.toLowerCase())) && elem.getAvailable()) {
-                itemsBySearch.add(ItemMapper.toItemDto(elem));
-            }
-        }
-        return itemsBySearch;
-    }
-
-    private Item checkItem(int itemId) {
-        try {
-            return items.get(itemId);
-        } catch (RuntimeException e) {
-            throw new NonExistentItemException("Вещь с таким id не найдена.");
-        }
+        return items.values()
+                .stream()
+                .filter(x -> (x.getName().toLowerCase().contains(text.toLowerCase()) ||
+                        x.getDescription().toLowerCase().contains(text.toLowerCase())) && x.getAvailable())
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList());
     }
 }

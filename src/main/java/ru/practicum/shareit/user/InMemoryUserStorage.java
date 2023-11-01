@@ -7,11 +7,13 @@ import ru.practicum.shareit.exp.NonExistentUserException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class InMemoryUserStorage implements UserStorage {
     private int countId = 0;
-    private final Map<String, User> users = new HashMap<>();
+    private final Map<Integer, User> users = new HashMap<>();
+    private final Map<Integer, String> emails = new HashMap<>();
 
     @Override
     public User replaceUser(UserDto userDto, int userId) {
@@ -19,14 +21,15 @@ public class InMemoryUserStorage implements UserStorage {
         if (userDto.getEmail() != null) {
             if (!oldUser.getEmail().equals(userDto.getEmail())) {
                 checkExistEmail(userDto.getEmail());
-                users.remove(oldUser.getEmail());
+                deleteUser(userId);
                 oldUser.setEmail(userDto.getEmail());
-                users.put(oldUser.getEmail(), oldUser);
+                users.put(userId, oldUser);
+                emails.put(userId, oldUser.getEmail());
             }
         }
         if (userDto.getName() != null) {
             oldUser.setName(userDto.getName());
-            users.replace(oldUser.getEmail(), oldUser);
+            users.replace(userId, oldUser);
         }
         return oldUser;
     }
@@ -40,27 +43,25 @@ public class InMemoryUserStorage implements UserStorage {
     public User createUser(User user) {
         checkExistEmail(user.getEmail());
         user.setId(++countId);
-        users.put(user.getEmail(), user);
+        users.put(user.getId(), user);
+        emails.put(user.getId(), user.getEmail());
         return user;
     }
 
     @Override
     public User getUserById(int userId) {
-        for (User elem : users.values()) {
-            if (elem.getId() == userId) {
-                return elem;
-            }
-        }
-        throw new NonExistentUserException("Пользователя с таким id не существует");
+        return Optional.ofNullable(users.get(userId))
+                .orElseThrow(() -> new NonExistentUserException("Пользователь с таким id не найден."));
     }
 
     @Override
     public void deleteUser(int userId) {
-        users.remove(getUserById(userId).getEmail());
+        users.remove(userId);
+        emails.remove(userId);
     }
 
     private void checkExistEmail(String email) {
-        if (users.containsKey(email)) {
+        if (emails.containsValue(email)) {
             throw new EmailExistsException("Пользователь с таким email уже существует");
         }
     }
