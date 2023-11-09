@@ -1,11 +1,11 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.item;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * TODO Sprint add-controllers.
@@ -13,16 +13,12 @@ import javax.validation.constraints.NotEmpty;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class ItemDto {
     private int id;
     @NotEmpty
     private String name;
-    @Email
     @NotEmpty
-    private String email;
-
-    public User(String name, String email) {
-        this.name = name;
-        this.email = email;
-    }
+    private String description;
+    @NotNull
+    private Boolean available;
 }
