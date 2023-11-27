@@ -68,17 +68,17 @@ public class ItemServiceImpl implements ItemService {
                 itemBookingDto.setLastBooking(new BookingForItemDTO(lastBooking.getId(),
                         lastBooking.getBooker().getId()));
             }
-            Booking nextBooking = bookingRepository.
-                    findFirstByItemIdAndItemOwnerIdAndStartAfterAndStatusOrderByStartAsc(itemBookingDto.getId(),
+            Booking nextBooking = bookingRepository
+                    .findFirstByItemIdAndItemOwnerIdAndStartAfterAndStatusOrderByStartAsc(itemBookingDto.getId(),
                             userId, LocalDateTime.now(), Status.APPROVED);
             if (nextBooking != null) {
                 itemBookingDto.setNextBooking(new BookingForItemDTO(nextBooking.getId(),
                         nextBooking.getBooker().getId()));
             }
-            itemBookingDto.setComments(commentRepository.findByItemId(itemId).
-                    stream().
-                    map(CommentMapper::toCommentDtoForSend).
-                    collect(Collectors.toList()));
+            itemBookingDto.setComments(commentRepository.findByItemId(itemId)
+                    .stream()
+                    .map(CommentMapper::toCommentDtoForSend)
+                    .collect(Collectors.toList()));
             return itemBookingDto;
         } catch (RuntimeException e) {
             throw new NonExistentItemException("Вещь с таким id не найдена.");
@@ -93,23 +93,23 @@ public class ItemServiceImpl implements ItemService {
                         item -> {
                             ItemBookingDto itemBookingDto = ItemMapper.toItemBookingDto(item);
                             Booking lastBooking = bookingRepository
-                                    .findFirstByItemIdAndItemOwnerIdAndStartBeforeAndStatusOrderByEndDesc
-                                            (itemBookingDto.getId(), userId, LocalDateTime.now(), Status.APPROVED);
+                                    .findFirstByItemIdAndItemOwnerIdAndStartBeforeAndStatusOrderByEndDesc(
+                                            itemBookingDto.getId(), userId, LocalDateTime.now(), Status.APPROVED);
                             if (lastBooking != null) {
                                 itemBookingDto.setLastBooking(new BookingForItemDTO(lastBooking.getId(),
                                         lastBooking.getBooker().getId()));
                             }
-                            Booking nextBooking = bookingRepository.
-                                    findFirstByItemIdAndItemOwnerIdAndStartAfterAndStatusOrderByStartAsc
-                                            (itemBookingDto.getId(), userId, LocalDateTime.now(), Status.APPROVED);
+                            Booking nextBooking = bookingRepository
+                                    .findFirstByItemIdAndItemOwnerIdAndStartAfterAndStatusOrderByStartAsc(
+                                            itemBookingDto.getId(), userId, LocalDateTime.now(), Status.APPROVED);
                             if (nextBooking != null) {
                                 itemBookingDto.setNextBooking(new BookingForItemDTO(nextBooking.getId(),
                                         nextBooking.getBooker().getId()));
                             }
-                            itemBookingDto.setComments(commentRepository.findByItemId(itemBookingDto.getId()).
-                                    stream().
-                                    map(CommentMapper::toCommentDtoForSend).
-                                    collect(Collectors.toList()));
+                            itemBookingDto.setComments(commentRepository.findByItemId(itemBookingDto.getId())
+                                    .stream()
+                                    .map(CommentMapper::toCommentDtoForSend)
+                                    .collect(Collectors.toList()));
                             return itemBookingDto;
                         }
                 )
