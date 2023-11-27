@@ -12,8 +12,10 @@ import javax.validation.constraints.NotEmpty;
 @NoArgsConstructor
 public class UserDto {
     private int id;
+
     @NotEmpty
     private String name;
+
     @Email
     @NotEmpty
     private String email;

@@ -28,17 +28,23 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@RequestHeader("X-Sharer-User-Id") int userId, @PathVariable int itemId) {
+    public ItemBookingDto getItemById(@RequestHeader("X-Sharer-User-Id") int userId, @PathVariable int itemId) {
         return itemService.getItemById(userId, itemId);
     }
 
     @GetMapping
-    public List<ItemDto> getItemsOwnerById(@RequestHeader("X-Sharer-User-Id") int userId) {
+    public List<ItemBookingDto> getItemsOwnerById(@RequestHeader("X-Sharer-User-Id") int userId) {
         return itemService.getItemsOwnerById(userId);
     }
 
     @GetMapping("/search")
     public List<ItemDto> getItemBySearch(@RequestHeader("X-Sharer-User-Id") int userId, @RequestParam String text) {
         return itemService.getItemBySearch(userId, text);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDtoForSend createComment(@RequestHeader("X-Sharer-User-Id") int userId,
+                                           @RequestBody @Valid CommentDto commentDto, @PathVariable int itemId) {
+        return itemService.createComment(userId, commentDto, itemId);
     }
 }

@@ -7,9 +7,11 @@ public interface ItemService {
 
     ItemDto replaceItem(ItemDto itemDto, int userId, int itemId);
 
-    ItemDto getItemById(int userId, int itemId);
+    ItemBookingDto getItemById(int userId, int itemId);
 
-    List<ItemDto> getItemsOwnerById(int userId);
+    List<ItemBookingDto> getItemsOwnerById(int userId);
 
     List<ItemDto> getItemBySearch(int userId, String text);
+
+    CommentDtoForSend createComment(int userId, CommentDto text, int itemId);
 }
