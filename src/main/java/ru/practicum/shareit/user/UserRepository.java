@@ -3,25 +3,26 @@ package ru.practicum.shareit.user;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import javax.transaction.Transactional;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
-    @Modifying(clearAutomatically = true)
+    @Modifying
     @Transactional
-    @Query("UPDATE User AS u SET u.name = ?1, u.email = ?2 WHERE u.id = ?3")
-    void saveUserById(String name, String email, int userId);
+    @Query("UPDATE User AS u SET u.name = :name, u.email = :email WHERE u.id = :userId")
+    void saveUserById(@Param("name") String name, @Param("email") String email, @Param("userId") int userId);
 
-    @Modifying(clearAutomatically = true)
+    @Modifying
     @Transactional
-    @Query("UPDATE User AS u SET u.name = ?1 WHERE u.id = ?2")
-    void saveUserNameById(String name, int userId);
+    @Query("UPDATE User AS u SET u.name = :name WHERE u.id = :userId")
+    void saveUserNameById(@Param("name") String name, @Param("userId") int userId);
 
-    @Modifying(clearAutomatically = true)
+    @Modifying
     @Transactional
-    @Query("UPDATE User AS u SET u.email = ?1 WHERE u.id = ?2")
-    void saveUserEmailById(String email, int userId);
+    @Query("UPDATE User AS u SET u.email = :email WHERE u.id = :userId")
+    void saveUserEmailById(@Param("email") String email, @Param("userId") int userId);
 
-    @Query("SELECT COUNT(u) FROM User AS u WHERE u.id = ?1")
-    Integer countUserById(Integer userId);
+    @Query("SELECT COUNT(u) FROM User AS u WHERE u.id = :userId")
+    Integer countUserById(@Param("userId") Integer userId);
 }

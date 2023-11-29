@@ -1,8 +1,9 @@
 package ru.practicum.shareit.item;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
 
@@ -11,7 +12,8 @@ import javax.persistence.*;
 /**
  * TODO Sprint add-controllers.
  */
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -21,7 +23,7 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private User owner;
 

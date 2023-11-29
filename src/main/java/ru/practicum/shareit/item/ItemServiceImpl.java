@@ -29,14 +29,15 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto createItem(ItemDto itemDto, int userId) {
         Item item = ItemMapper.toItem(itemDto);
         item.setOwner(userRepository.findById(userId).orElseThrow(() ->
-                new NonExistentUserException("Пользователь с таким id не найден.")));
+                new NonExistentItemException("Вещь с таким id не найден.")));
         return ItemMapper.toItemDto(itemRepository.save(item));
     }
 
     @Override
     public ItemDto replaceItem(ItemDto itemDto, int userId, int itemId) {
         try {
-            Item item = itemRepository.getById(itemId);
+            Item item = itemRepository.findById(itemId).orElseThrow(() ->
+                    new NonExistentUserException("Пользователь с таким id не найден."));
             if (item.getOwner().getId() != userId) {
                 throw new NonExistentUserException("Пользователь не является владельцем вещи.");
             }
@@ -60,7 +61,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemBookingDto getItemById(int userId, int itemId) {
         try {
-            ItemBookingDto itemBookingDto = ItemMapper.toItemBookingDto(itemRepository.getById(itemId));
+            ItemBookingDto itemBookingDto = ItemMapper.toItemBookingDto(itemRepository.findById(itemId)
+                    .orElseThrow(() -> new NonExistentUserException("Вещь с таким id не найден.")));
             Booking lastBooking = bookingRepository
                     .findFirstByItemIdAndItemOwnerIdAndStartBeforeAndStatusOrderByEndDesc(itemBookingDto.getId(),
                             userId, LocalDateTime.now(), Status.APPROVED);
@@ -134,7 +136,11 @@ public class ItemServiceImpl implements ItemService {
                 Status.APPROVED) == 0) {
             throw new CommentException("Пользователь не брал вещь в аренду или срок аренды еще не прошел.");
         }
-        commentRepository.saveByItemIdAndAuthorNameId(userId, commentDto.getText(), itemId, LocalDateTime.now());
+        commentRepository.save(new Comment(0, commentDto.getText(), itemRepository.findById(itemId)
+                .orElseThrow(() -> new NonExistentItemException("Вещь с таким id не найдена.")), userRepository
+                .findById(userId)
+                .orElseThrow(() -> new NonExistentUserException("Пользователь с таким id не найден.")),
+                LocalDateTime.now()));
         return CommentMapper.toCommentDtoForSend(commentRepository.findByAuthorNameIdAndItemId(userId, itemId));
     }
 }

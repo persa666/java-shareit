@@ -24,7 +24,7 @@ public class ItemMapper {
     public static ItemBookingDto toItemBookingDto(Item item) {
         return new ItemBookingDto(
                 item.getId(),
-                item.getOwner(),
+                //item.getOwner(),
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),

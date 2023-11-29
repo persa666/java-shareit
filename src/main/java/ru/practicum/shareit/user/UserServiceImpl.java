@@ -3,6 +3,7 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exp.EmailExistsException;
+import ru.practicum.shareit.exp.NonExistentBookingException;
 import ru.practicum.shareit.exp.NonExistentUserException;
 
 import java.util.List;
@@ -26,7 +27,8 @@ public class UserServiceImpl implements UserService {
             } else {
                 userRepository.saveUserNameById(userDto.getName(), userId);
             }
-            return UserMapper.toUserDto(userRepository.getById(userId));
+            return UserMapper.toUserDto(userRepository.findById(userId).orElseThrow(() ->
+                    new NonExistentBookingException("Пользователь с таким id не найден.")));
         } catch (RuntimeException e) {
             throw new EmailExistsException("Пользователь с таким email уже существует");
         }
@@ -52,7 +54,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getUserById(int userId) {
         try {
-            return UserMapper.toUserDto(userRepository.getById(userId));
+            return UserMapper.toUserDto(userRepository.findById(userId).orElseThrow(() ->
+                    new NonExistentBookingException("Пользователь с таким id не найден.")));
         } catch (RuntimeException e) {
             throw new NonExistentUserException("Пользователь с таким id не найден.");
         }
