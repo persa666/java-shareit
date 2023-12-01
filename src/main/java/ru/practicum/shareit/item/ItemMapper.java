@@ -20,4 +20,18 @@ public class ItemMapper {
                 null
         );
     }
+
+    public static ItemBookingDto toItemBookingDto(Item item) {
+        return new ItemBookingDto(
+                item.getId(),
+                //item.getOwner(),
+                item.getName(),
+                item.getDescription(),
+                item.getAvailable(),
+                item.getRequest(),
+                null,
+                null,
+                null
+        );
+    }
 }
