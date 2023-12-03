@@ -17,8 +17,9 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ItemDto createItem(@RequestBody @Valid ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") int userId) {
-        return itemService.createItem(itemDto, userId);
+    public ItemDtoForRequest createItem(@RequestBody @Valid ItemDtoForRequest itemDtoForRequest,
+                                        @RequestHeader("X-Sharer-User-Id") int userId) {
+        return itemService.createItem(itemDtoForRequest, userId);
     }
 
     @PatchMapping("/{itemId}")
@@ -33,13 +34,17 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemBookingDto> getItemsOwnerById(@RequestHeader("X-Sharer-User-Id") int userId) {
-        return itemService.getItemsOwnerById(userId);
+    public List<ItemBookingDto> getItemsOwnerById(@RequestHeader("X-Sharer-User-Id") int userId,
+                                                  @RequestParam(name = "from", defaultValue = "0") int from,
+                                                  @RequestParam(name = "size", defaultValue = "30") int size) {
+        return itemService.getItemsOwnerById(userId, from, size);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> getItemBySearch(@RequestHeader("X-Sharer-User-Id") int userId, @RequestParam String text) {
-        return itemService.getItemBySearch(userId, text);
+    public List<ItemDto> getItemBySearch(@RequestHeader("X-Sharer-User-Id") int userId, @RequestParam String text,
+                                         @RequestParam(name = "from", defaultValue = "0") int from,
+                                         @RequestParam(name = "size", defaultValue = "30") int size) {
+        return itemService.getItemBySearch(userId, text, from, size);
     }
 
     @PostMapping("/{itemId}/comment")

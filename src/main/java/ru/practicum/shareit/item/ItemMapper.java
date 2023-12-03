@@ -21,10 +21,20 @@ public class ItemMapper {
         );
     }
 
+    public static Item toItem(ItemDtoForRequest itemDtoForRequest) {
+        return new Item(
+                itemDtoForRequest.getId(),
+                null,
+                itemDtoForRequest.getName(),
+                itemDtoForRequest.getDescription(),
+                itemDtoForRequest.getAvailable(),
+                null
+        );
+    }
+
     public static ItemBookingDto toItemBookingDto(Item item) {
         return new ItemBookingDto(
                 item.getId(),
-                //item.getOwner(),
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
@@ -32,6 +42,16 @@ public class ItemMapper {
                 null,
                 null,
                 null
+        );
+    }
+
+    public static ItemDtoForRequest toItemDtoForRequest(Item item) {
+        return new ItemDtoForRequest(
+                item.getId(),
+                item.getName(),
+                item.getDescription(),
+                item.getAvailable(),
+                item.getRequestIdOrNull()
         );
     }
 }

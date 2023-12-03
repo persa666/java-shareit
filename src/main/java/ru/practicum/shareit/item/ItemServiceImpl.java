@@ -1,14 +1,14 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dto.BookingForItemDTO;
-import ru.practicum.shareit.exp.CommentException;
-import ru.practicum.shareit.exp.NonExistentItemException;
-import ru.practicum.shareit.exp.NonExistentUserException;
+import ru.practicum.shareit.exp.*;
+import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
@@ -24,13 +24,18 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Override
-    public ItemDto createItem(ItemDto itemDto, int userId) {
-        Item item = ItemMapper.toItem(itemDto);
+    public ItemDtoForRequest createItem(ItemDtoForRequest itemDtoForRequest, int userId) {
+        Item item = ItemMapper.toItem(itemDtoForRequest);
         item.setOwner(userRepository.findById(userId).orElseThrow(() ->
                 new NonExistentItemException("Вещь с таким id не найден.")));
-        return ItemMapper.toItemDto(itemRepository.save(item));
+        if (itemDtoForRequest.getRequestId() != null) {
+            item.setRequest(itemRequestRepository.findById(itemDtoForRequest.getRequestId())
+                    .orElseThrow(() -> new NonExistentItemRequestException("Запроса с таким id нет")));
+        }
+        return ItemMapper.toItemDtoForRequest(itemRepository.save(item));
     }
 
     @Override
@@ -55,7 +60,6 @@ public class ItemServiceImpl implements ItemService {
         } catch (RuntimeException e) {
             throw new NonExistentItemException("Вещь с таким id не найдена.");
         }
-
     }
 
     @Override
@@ -88,8 +92,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemBookingDto> getItemsOwnerById(int userId) {
-        return itemRepository.findAllByOwner_Id(userId)
+    public List<ItemBookingDto> getItemsOwnerById(int userId, int from, int size) {
+        checkFromAndSize(from, size);
+        return itemRepository.findByOwnerId(userId, PageRequest.of(from / size, size))
                 .stream()
                 .map(
                         item -> {
@@ -120,11 +125,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getItemBySearch(int userId, String text) {
+    public List<ItemDto> getItemBySearch(int userId, String text, int from, int size) {
+        checkFromAndSize(from, size);
         if (text.isBlank()) {
             return new ArrayList<>();
         }
-        return itemRepository.search(text)
+        return itemRepository.search(text, PageRequest.of(from / size, size))
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
@@ -142,5 +148,11 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new NonExistentUserException("Пользователь с таким id не найден.")),
                 LocalDateTime.now()));
         return CommentMapper.toCommentDtoForSend(commentRepository.findByAuthorNameIdAndItemId(userId, itemId));
+    }
+
+    private void checkFromAndSize(int from, int size) {
+        if (from < 0 || size <= 0) {
+            throw new CountsException("Параметр(ы) неудовлетворяют условиям пагинации.");
+        }
     }
 }

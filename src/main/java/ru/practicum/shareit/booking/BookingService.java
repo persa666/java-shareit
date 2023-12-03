@@ -12,7 +12,7 @@ public interface BookingService {
 
     BookingDtoForSend findBookingById(int userId, int bookingId);
 
-    List<BookingDtoForSend> findBookingsByUserId(int userId, String state);
+    List<BookingDtoForSend> findBookingsByUserId(int userId, String state, int from, int size);
 
-    List<BookingDtoForSend> findBookingForItemsByUserId(int userId, String state);
+    List<BookingDtoForSend> findBookingForItemsByUserId(int userId, String state, int from, int size);
 }

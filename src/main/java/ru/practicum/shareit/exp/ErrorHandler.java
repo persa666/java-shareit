@@ -40,6 +40,14 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleRequestNotFound(final NonExistentItemRequestException e) {
+        return new ErrorResponse(
+                "Ошибка с поиском запроса.", e.getMessage()
+        );
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleBookingBadRequest(final BookingException e) {
         return new ErrorResponse(
@@ -60,6 +68,14 @@ public class ErrorHandler {
     public ErrorResponse handleCommentBadRequest(final CommentException e) {
         return new ErrorResponse(
                 "Ошибка с добавлением статуса.", e.getMessage()
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleCountsBadRequest(final CountsException e) {
+        return new ErrorResponse(
+                "Ошибка с параметрами для пагинациии.", e.getMessage()
         );
     }
 }
