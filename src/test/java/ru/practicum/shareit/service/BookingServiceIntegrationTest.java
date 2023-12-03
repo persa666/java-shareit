@@ -64,16 +64,7 @@ public class BookingServiceIntegrationTest {
         booking.setBooker(booker);
         booking.setStatus(Status.APPROVED);
 
-        Booking nextBooking = new Booking();
-        nextBooking.setId(2);
-        nextBooking.setStart(LocalDateTime.now().plusDays(1));
-        nextBooking.setEnd(LocalDateTime.now().plusDays(2));
-        nextBooking.setItem(item);
-        nextBooking.setBooker(nextBooker);
-        nextBooking.setStatus(Status.APPROVED);
-
         booking = bookingRepository.save(booking);
-        nextBooking = bookingRepository.save(nextBooking);
 
         BookingDtoForSend foundBooking = bookingService.findBookingById(booker.getId(), booking.getId());
 
