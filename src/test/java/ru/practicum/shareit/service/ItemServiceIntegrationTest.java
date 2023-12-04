@@ -96,5 +96,8 @@ public class ItemServiceIntegrationTest {
 
         assertNotNull(list, "Список не должен быть null");
         assertEquals(1, list.size(), "Размер списка должен быть равен 1");
+
+        bookingRepository.delete(booking);
+        bookingRepository.delete(nextBooking);
     }
 }

@@ -11,7 +11,10 @@ import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.BookingServiceImpl;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dto.BookingDtoForSend;
-import ru.practicum.shareit.item.*;
+import ru.practicum.shareit.item.Item;
+import ru.practicum.shareit.item.ItemDtoForRequest;
+import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -45,7 +48,6 @@ public class BookingServiceIntegrationTest {
         booker = userRepository.save(booker);
         User nextBooker = new User("booker2", "1234@mail.com");
         nextBooker = userRepository.save(nextBooker);
-        CommentDto commentDto = new CommentDto("text");
 
         ItemDtoForRequest itemDtoForRequest = new ItemDtoForRequest();
         itemDtoForRequest.setName("name");
@@ -74,5 +76,7 @@ public class BookingServiceIntegrationTest {
                 foundBooking.getId(), "ID бронирования должен соответствовать ожидаемому значению");
         assertEquals(booking.getStatus(),
                 foundBooking.getStatus(), "Статус бронирования должен соответствовать ожидаемому значению");
+
+        bookingRepository.delete(booking);
     }
 }
