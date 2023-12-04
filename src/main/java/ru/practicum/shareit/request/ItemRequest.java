@@ -32,4 +32,10 @@ public class ItemRequest {
 
     @Column(name = "created")
     private LocalDateTime created;
+
+    public ItemRequest(String description, User requestor, LocalDateTime created) {
+        this.description = description;
+        this.requestor = requestor;
+        this.created = created;
+    }
 }

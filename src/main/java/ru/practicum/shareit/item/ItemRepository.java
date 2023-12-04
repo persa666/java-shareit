@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface ItemRepository extends JpaRepository<Item, Integer> {
@@ -17,4 +18,6 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
     Page<Item> search(@Param("text") String text, Pageable pageable);
 
     List<Item> findByRequestId(int requestId);
+
+    List<Item> findByRequestIdIn(Collection<Integer> ages);
 }

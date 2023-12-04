@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.BookingController;
@@ -163,7 +164,8 @@ public class BookingControllerTest {
                 )
         );
 
-        Mockito.when(bookingService.findBookingsByUserId(userId, state, from, size)).thenReturn(bookings);
+        Mockito.when(bookingService.findBookingsByUserId(userId, state, PageRequest.of(from / size, size)))
+                .thenReturn(bookings);
 
         mockMvc.perform(
                         get("/bookings")
@@ -177,7 +179,8 @@ public class BookingControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(bookings)));
 
-        Mockito.verify(bookingService, Mockito.times(1)).findBookingsByUserId(userId, state, from, size);
+        Mockito.verify(bookingService, Mockito.times(1)).findBookingsByUserId(userId, state,
+                PageRequest.of(from / size, size));
         Mockito.verifyNoMoreInteractions(bookingService);
     }
 
@@ -215,7 +218,8 @@ public class BookingControllerTest {
                 )
         );
 
-        Mockito.when(bookingService.findBookingForItemsByUserId(userId, state, from, size)).thenReturn(bookings);
+        Mockito.when(bookingService.findBookingForItemsByUserId(userId, state, PageRequest.of(from / size, size)))
+                .thenReturn(bookings);
 
         mockMvc.perform(
                         get("/bookings/owner")
@@ -229,7 +233,8 @@ public class BookingControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(bookings)));
 
-        Mockito.verify(bookingService, Mockito.times(1)).findBookingForItemsByUserId(userId, state, from, size);
+        Mockito.verify(bookingService, Mockito.times(1)).findBookingForItemsByUserId(userId, state,
+                PageRequest.of(from / size, size));
         Mockito.verifyNoMoreInteractions(bookingService);
     }
 }

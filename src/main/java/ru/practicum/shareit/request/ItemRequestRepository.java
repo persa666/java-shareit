@@ -11,4 +11,5 @@ public interface ItemRequestRepository extends JpaRepository<ItemRequest, Intege
     List<ItemRequest> findByRequestorId(int userId);
 
     Page<ItemRequest> findByRequestorIdNot(int userId, Pageable pageable);
+
 }

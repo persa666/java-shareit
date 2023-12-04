@@ -2,11 +2,10 @@ package ru.practicum.shareit.request;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exp.CountsException;
 import ru.practicum.shareit.exp.NonExistentItemRequestException;
 import ru.practicum.shareit.exp.NonExistentUserException;
+import ru.practicum.shareit.item.ItemDtoForRequest;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -16,7 +15,9 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,7 +31,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public ItemRequestDtoForSend createRequest(int userId, ItemRequestDto itemRequestDto) {
         User requestor = userRepository.findById(userId)
                 .orElseThrow(() -> new NonExistentUserException("Пользователя с таким id нет"));
-        ItemRequest itemRequest = new ItemRequest(0, itemRequestDto.getDescription(), requestor,
+        ItemRequest itemRequest = new ItemRequest(itemRequestDto.getDescription(), requestor,
                 LocalDateTime.now());
         return ItemRequestMapper.toItemRequestDtoForSend(itemRequestRepository.save(itemRequest));
     }
@@ -48,13 +49,12 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public List<ItemRequestDtoWithItem> getAllRequestOtherUsers(int userId, int from, int size) {
-        checkFromAndSize(from, size);
+    public List<ItemRequestDtoWithItem> getAllRequestOtherUsers(int userId, PageRequest pageRequest) {
         if (!userRepository.existsById(userId)) {
             throw new NonExistentUserException("Пользователя с таким id нет.");
         }
         List<ItemRequestDtoWithItem> allRequests = itemRequestRepository
-                .findByRequestorIdNot(userId, PageRequest.of(from / size, size, Sort.by("created")))
+                .findByRequestorIdNot(userId, pageRequest)
                 .stream()
                 .map(ItemRequestMapper::toItemRequestDtoWithItem)
                 .collect(Collectors.toList());
@@ -62,13 +62,21 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     private List<ItemRequestDtoWithItem> getAllRequest(List<ItemRequestDtoWithItem> list) {
-        for (ItemRequestDtoWithItem elem : list) {
-            elem.setItems(itemRepository.findByRequestId(elem.getId())
-                    .stream()
-                    .map(ItemMapper::toItemDtoForRequest)
-                    .collect(Collectors.toList()));
-        }
-        return list;
+        List<Integer> requestIds = list.stream()
+                .map(ItemRequestDtoWithItem::getId)
+                .collect(Collectors.toList());
+        List<ItemDtoForRequest> items = itemRepository.findByRequestIdIn(requestIds)
+                .stream()
+                .map(ItemMapper::toItemDtoForRequest)
+                .collect(Collectors.toList());
+        Map<Integer, List<ItemDtoForRequest>> itemsByRequestId = items.stream()
+                .collect(Collectors.groupingBy(ItemDtoForRequest::getRequestId));
+        return list.stream()
+                .peek(request -> {
+                    List<ItemDtoForRequest> associatedItems = itemsByRequestId.getOrDefault(request.getId(), Collections.emptyList());
+                    request.setItems(associatedItems);
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -83,11 +91,5 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 .map(ItemMapper::toItemDtoForRequest)
                 .collect(Collectors.toList()));
         return request;
-    }
-
-    private void checkFromAndSize(int from, int size) {
-        if (from < 0 || size <= 0) {
-            throw new CountsException("Параметр(ы) неудовлетворяют условиям пагинации.");
-        }
     }
 }

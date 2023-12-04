@@ -15,7 +15,10 @@ import ru.practicum.shareit.booking.BookingServiceImpl;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoForSend;
-import ru.practicum.shareit.exp.*;
+import ru.practicum.shareit.exp.BookingException;
+import ru.practicum.shareit.exp.NonExistentBookingException;
+import ru.practicum.shareit.exp.NonExistentUserException;
+import ru.practicum.shareit.exp.StatusException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.user.User;
@@ -250,40 +253,7 @@ public class BookingServiceTest {
         when(userRepository.countUserById(any(Integer.class))).thenReturn(0);
 
         assertThrows(NonExistentUserException.class,
-                () -> bookingService.findBookingsByUserId(userId, state, from, size));
-    }
-
-    @Test
-    void checkFromAndSizeExceptionTest() {
-        int userId = 1;
-        String state = "ALL";
-        int from = -1;
-        int size = -1;
-
-        assertThrows(CountsException.class,
-                () -> bookingService.findBookingsByUserId(userId, state, from, size));
-    }
-
-    @Test
-    void checkFromAndSizeFromNegativeTest() {
-        int userId = 1;
-        String state = "ALL";
-        int from = -1;
-        int size = 0;
-
-        assertThrows(CountsException.class,
-                () -> bookingService.findBookingsByUserId(userId, state, from, size));
-    }
-
-    @Test
-    void checkFromAndSizeSizeNegativeTest() {
-        int userId = 1;
-        String state = "ALL";
-        int from = 0;
-        int size = -1;
-
-        assertThrows(CountsException.class,
-                () -> bookingService.findBookingsByUserId(userId, state, from, size));
+                () -> bookingService.findBookingsByUserId(userId, state, PageRequest.of(from / size, size)));
     }
 
     @Test
@@ -298,7 +268,8 @@ public class BookingServiceTest {
         when(bookingRepository.findByBookerIdOrderByStartDesc(any(Integer.class), any(Pageable.class)))
                 .thenReturn(page);
 
-        List<BookingDtoForSend> bookings = bookingService.findBookingsByUserId(userId, state, from, size);
+        List<BookingDtoForSend> bookings = bookingService.findBookingsByUserId(userId, state,
+                PageRequest.of(from / size, size));
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertTrue(bookings.isEmpty(), "List of bookings should be empty");
@@ -320,7 +291,8 @@ public class BookingServiceTest {
                 any(LocalDateTime.class), any(LocalDateTime.class), any(Pageable.class)))
                 .thenReturn(page);
 
-        List<BookingDtoForSend> bookings = bookingService.findBookingsByUserId(userId, state, from, size);
+        List<BookingDtoForSend> bookings = bookingService.findBookingsByUserId(userId, state,
+                PageRequest.of(from / size, size));
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertTrue(bookings.isEmpty(), "List of bookings should be empty");
@@ -340,7 +312,8 @@ public class BookingServiceTest {
         when(bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(any(Integer.class),
                 any(LocalDateTime.class), any(Pageable.class))).thenReturn(page);
 
-        List<BookingDtoForSend> bookings = bookingService.findBookingsByUserId(userId, state, from, size);
+        List<BookingDtoForSend> bookings = bookingService.findBookingsByUserId(userId, state,
+                PageRequest.of(from / size, size));
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertTrue(bookings.isEmpty(), "List of bookings should be empty");
@@ -360,7 +333,8 @@ public class BookingServiceTest {
         when(bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(any(Integer.class),
                 any(LocalDateTime.class), any(Pageable.class))).thenReturn(page);
 
-        List<BookingDtoForSend> bookings = bookingService.findBookingsByUserId(userId, state, from, size);
+        List<BookingDtoForSend> bookings = bookingService.findBookingsByUserId(userId, state,
+                PageRequest.of(from / size, size));
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertTrue(bookings.isEmpty(), "List of bookings should be empty");
@@ -380,7 +354,8 @@ public class BookingServiceTest {
         when(bookingRepository.findByBookerIdAndStatusOrderByStartDesc(any(Integer.class), any(Status.class),
                 any(Pageable.class))).thenReturn(page);
 
-        List<BookingDtoForSend> bookings = bookingService.findBookingsByUserId(userId, state, from, size);
+        List<BookingDtoForSend> bookings = bookingService.findBookingsByUserId(userId, state,
+                PageRequest.of(from / size, size));
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertTrue(bookings.isEmpty(), "List of bookings should be empty");
@@ -400,7 +375,8 @@ public class BookingServiceTest {
         when(bookingRepository.findByBookerIdAndStatusOrderByStartDesc(any(Integer.class), any(Status.class),
                 any(Pageable.class))).thenReturn(page);
 
-        List<BookingDtoForSend> bookings = bookingService.findBookingsByUserId(userId, state, from, size);
+        List<BookingDtoForSend> bookings = bookingService.findBookingsByUserId(userId, state,
+                PageRequest.of(from / size, size));
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertTrue(bookings.isEmpty(), "List of bookings should be empty");
@@ -417,7 +393,7 @@ public class BookingServiceTest {
         when(userRepository.countUserById(any(Integer.class))).thenReturn(1);
 
         assertThrows(StatusException.class,
-                () -> bookingService.findBookingsByUserId(userId, state, from, size));
+                () -> bookingService.findBookingsByUserId(userId, state, PageRequest.of(from / size, size)));
 
         verify(userRepository, times(1)).countUserById(userId);
     }
@@ -431,7 +407,7 @@ public class BookingServiceTest {
         when(userRepository.countUserById(any(Integer.class))).thenReturn(0);
 
         assertThrows(NonExistentUserException.class,
-                () -> bookingService.findBookingForItemsByUserId(userId, state, from, size));
+                () -> bookingService.findBookingForItemsByUserId(userId, state, PageRequest.of(from / size, size)));
     }
 
     @Test
@@ -446,7 +422,8 @@ public class BookingServiceTest {
         when(bookingRepository.findByItemOwnerIdOrderByStartDesc(any(Integer.class), any(Pageable.class)))
                 .thenReturn(page);
 
-        List<BookingDtoForSend> bookings = bookingService.findBookingForItemsByUserId(userId, state, from, size);
+        List<BookingDtoForSend> bookings = bookingService.findBookingForItemsByUserId(userId, state,
+                PageRequest.of(from / size, size));
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertTrue(bookings.isEmpty(), "List of bookings should be empty");
@@ -468,7 +445,8 @@ public class BookingServiceTest {
                 any(LocalDateTime.class), any(LocalDateTime.class), any(Pageable.class)))
                 .thenReturn(page);
 
-        List<BookingDtoForSend> bookings = bookingService.findBookingForItemsByUserId(userId, state, from, size);
+        List<BookingDtoForSend> bookings = bookingService.findBookingForItemsByUserId(userId, state,
+                PageRequest.of(from / size, size));
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertTrue(bookings.isEmpty(), "List of bookings should be empty");
@@ -488,7 +466,8 @@ public class BookingServiceTest {
         when(bookingRepository.findByItemOwnerIdAndEndBeforeOrderByStartDesc(any(Integer.class),
                 any(LocalDateTime.class), any(Pageable.class))).thenReturn(page);
 
-        List<BookingDtoForSend> bookings = bookingService.findBookingForItemsByUserId(userId, state, from, size);
+        List<BookingDtoForSend> bookings = bookingService.findBookingForItemsByUserId(userId, state,
+                PageRequest.of(from / size, size));
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertTrue(bookings.isEmpty(), "List of bookings should be empty");
@@ -508,7 +487,8 @@ public class BookingServiceTest {
         when(bookingRepository.findByItemOwnerIdAndStartAfterOrderByStartDesc(any(Integer.class),
                 any(LocalDateTime.class), any(Pageable.class))).thenReturn(page);
 
-        List<BookingDtoForSend> bookings = bookingService.findBookingForItemsByUserId(userId, state, from, size);
+        List<BookingDtoForSend> bookings = bookingService.findBookingForItemsByUserId(userId, state,
+                PageRequest.of(from / size, size));
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertTrue(bookings.isEmpty(), "List of bookings should be empty");
@@ -528,7 +508,8 @@ public class BookingServiceTest {
         when(bookingRepository.findByItemOwnerIdAndStatus(any(Integer.class), any(Status.class),
                 any(Pageable.class))).thenReturn(page);
 
-        List<BookingDtoForSend> bookings = bookingService.findBookingForItemsByUserId(userId, state, from, size);
+        List<BookingDtoForSend> bookings = bookingService.findBookingForItemsByUserId(userId, state,
+                PageRequest.of(from / size, size));
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertTrue(bookings.isEmpty(), "List of bookings should be empty");
@@ -548,7 +529,8 @@ public class BookingServiceTest {
         when(bookingRepository.findByItemOwnerIdAndStatus(any(Integer.class), any(Status.class),
                 any(Pageable.class))).thenReturn(page);
 
-        List<BookingDtoForSend> bookings = bookingService.findBookingForItemsByUserId(userId, state, from, size);
+        List<BookingDtoForSend> bookings = bookingService.findBookingForItemsByUserId(userId, state,
+                PageRequest.of(from / size, size));
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertTrue(bookings.isEmpty(), "List of bookings should be empty");
@@ -565,7 +547,7 @@ public class BookingServiceTest {
         when(userRepository.countUserById(any(Integer.class))).thenReturn(1);
 
         assertThrows(StatusException.class,
-                () -> bookingService.findBookingForItemsByUserId(userId, state, from, size));
+                () -> bookingService.findBookingForItemsByUserId(userId, state, PageRequest.of(from / size, size)));
 
         verify(userRepository, times(1)).countUserById(userId);
     }

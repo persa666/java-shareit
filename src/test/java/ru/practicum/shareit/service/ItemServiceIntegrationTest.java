@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
@@ -47,6 +48,8 @@ public class ItemServiceIntegrationTest {
 
     @Test
     void getItemsOwnerByIdTest() {
+        int from = 0;
+        int size = 1;
         User user = new User("name", "asd@mail.com");
         user = userRepository.save(user);
         User booker = new User("booker", "123@mail.com");
@@ -89,8 +92,7 @@ public class ItemServiceIntegrationTest {
         itemService.createItem(itemDtoForRequest, user.getId());
         booking = bookingRepository.save(booking);
         nextBooking = bookingRepository.save(nextBooking);
-        itemService.createComment(booker.getId(), commentDto, item.getId());
-        List<ItemBookingDto> list = itemService.getItemsOwnerById(user.getId(), 0, 1);
+        List<ItemBookingDto> list = itemService.getItemsOwnerById(user.getId(), PageRequest.of(from / size, size));
 
         assertNotNull(list, "Список не должен быть null");
         assertEquals(1, list.size(), "Размер списка должен быть равен 1");

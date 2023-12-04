@@ -1,6 +1,9 @@
 package ru.practicum.shareit.request;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDtoForSend;
@@ -8,6 +11,7 @@ import ru.practicum.shareit.request.dto.ItemRequestDtoWithItem;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 /**
@@ -16,6 +20,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/requests")
+@Validated
 public class ItemRequestController {
     private final ItemRequestService itemRequestService;
 
@@ -32,9 +37,12 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public List<ItemRequestDtoWithItem> getAllRequestOtherUsers(@RequestHeader("X-Sharer-User-Id") @Positive int userId,
-                                                                @RequestParam(name = "from", defaultValue = "0") int from,
-                                                                @RequestParam(name = "size", defaultValue = "30") int size) {
-        return itemRequestService.getAllRequestOtherUsers(userId, from, size);
+                                                                @RequestParam(name = "from", defaultValue = "0")
+                                                                @PositiveOrZero int from,
+                                                                @RequestParam(name = "size", defaultValue = "30")
+                                                                @Positive int size) {
+        return itemRequestService.getAllRequestOtherUsers(userId, PageRequest.of(from / size, size,
+                Sort.by("created")));
     }
 
     @GetMapping("/{requestId}")

@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.item.*;
@@ -168,7 +169,8 @@ public class ItemControllerTest {
                         new ArrayList<>())
         );
 
-        Mockito.when(itemService.getItemsOwnerById(userId, from, size)).thenReturn(new ArrayList<>());
+        Mockito.when(itemService.getItemsOwnerById(userId, PageRequest.of(from / size, size)))
+                .thenReturn(new ArrayList<>());
 
         mockMvc.perform(get("/items")
                         .header("X-Sharer-User-Id", String.valueOf(userId))
@@ -180,7 +182,8 @@ public class ItemControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(new ArrayList<>())));
 
-        Mockito.verify(itemService, Mockito.times(1)).getItemsOwnerById(userId, from, size);
+        Mockito.verify(itemService, Mockito.times(1)).getItemsOwnerById(userId,
+                PageRequest.of(from / size, size));
         Mockito.verifyNoMoreInteractions(itemService);
     }
 
@@ -197,7 +200,8 @@ public class ItemControllerTest {
                 new ItemDto(3, "Name3", "Description3", true)
         );
 
-        Mockito.when(itemService.getItemBySearch(userId, searchText, from, size)).thenReturn(items);
+        Mockito.when(itemService.getItemBySearch(userId, searchText, PageRequest.of(from / size, size)))
+                .thenReturn(items);
 
         mockMvc.perform(get("/items/search")
                         .header("X-Sharer-User-Id", String.valueOf(userId))
@@ -210,7 +214,8 @@ public class ItemControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(items)));
 
-        Mockito.verify(itemService, Mockito.times(1)).getItemBySearch(userId, searchText, from, size);
+        Mockito.verify(itemService, Mockito.times(1)).getItemBySearch(userId, searchText,
+                PageRequest.of(from / size, size));
         Mockito.verifyNoMoreInteractions(itemService);
 
     }

@@ -7,7 +7,10 @@ import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dto.BookingForItemDTO;
-import ru.practicum.shareit.exp.*;
+import ru.practicum.shareit.exp.CommentException;
+import ru.practicum.shareit.exp.NonExistentItemException;
+import ru.practicum.shareit.exp.NonExistentItemRequestException;
+import ru.practicum.shareit.exp.NonExistentUserException;
 import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -92,9 +95,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemBookingDto> getItemsOwnerById(int userId, int from, int size) {
-        checkFromAndSize(from, size);
-        return itemRepository.findByOwnerId(userId, PageRequest.of(from / size, size))
+    public List<ItemBookingDto> getItemsOwnerById(int userId, PageRequest pageRequest) {
+        return itemRepository.findByOwnerId(userId, pageRequest)
                 .stream()
                 .map(
                         item -> {
@@ -125,12 +127,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getItemBySearch(int userId, String text, int from, int size) {
-        checkFromAndSize(from, size);
+    public List<ItemDto> getItemBySearch(int userId, String text, PageRequest pageRequest) {
         if (text.isBlank()) {
             return new ArrayList<>();
         }
-        return itemRepository.search(text, PageRequest.of(from / size, size))
+        return itemRepository.search(text, pageRequest)
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
@@ -150,9 +151,4 @@ public class ItemServiceImpl implements ItemService {
         return CommentMapper.toCommentDtoForSend(commentRepository.findByAuthorNameIdAndItemId(userId, itemId));
     }
 
-    private void checkFromAndSize(int from, int size) {
-        if (from < 0 || size <= 0) {
-            throw new CountsException("Параметр(ы) неудовлетворяют условиям пагинации.");
-        }
-    }
 }

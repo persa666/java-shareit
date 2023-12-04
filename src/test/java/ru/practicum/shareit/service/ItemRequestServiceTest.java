@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
-import ru.practicum.shareit.exp.CountsException;
 import ru.practicum.shareit.exp.NonExistentUserException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemRepository;
@@ -86,7 +85,7 @@ public class ItemRequestServiceTest {
 
         when(userRepository.existsById(any(Integer.class))).thenReturn(true);
         when(itemRequestRepository.findByRequestorId(userId)).thenReturn(list);
-        when(itemRepository.findByRequestId(any(Integer.class))).thenReturn(items);
+        when(itemRepository.findByRequestIdIn(any(List.class))).thenReturn(items);
 
         List<ItemRequestDtoWithItem> requests = itemRequestService.getAllRequestsUser(userId);
 
@@ -95,25 +94,6 @@ public class ItemRequestServiceTest {
 
         Mockito.verify(userRepository, Mockito.times(1)).existsById(userId);
         Mockito.verify(itemRequestRepository, Mockito.times(1)).findByRequestorId(userId);
-        Mockito.verify(itemRepository, Mockito.times(1)).findByRequestId(userId);
-    }
-
-    @Test
-    void getItemBySearchFromNegativeTest() {
-        int userId = 1;
-        int from = -1;
-        int size = 5;
-
-        assertThrows(CountsException.class, () -> itemRequestService.getAllRequestOtherUsers(userId, from, size));
-    }
-
-    @Test
-    void getItemBySearchSizeNegativeAndFromNegativeTest() {
-        int userId = 1;
-        int from = -1;
-        int size = -1;
-
-        assertThrows(CountsException.class, () -> itemRequestService.getAllRequestOtherUsers(userId, from, size));
     }
 
     @Test
@@ -125,7 +105,7 @@ public class ItemRequestServiceTest {
         when(userRepository.existsById(any(Integer.class))).thenReturn(false);
 
         assertThrows(NonExistentUserException.class, () -> itemRequestService
-                .getAllRequestOtherUsers(userId, from, size));
+                .getAllRequestOtherUsers(userId, PageRequest.of(from / size, size, Sort.by("created"))));
 
         Mockito.verify(userRepository, Mockito.times(1)).existsById(userId);
     }
@@ -141,7 +121,8 @@ public class ItemRequestServiceTest {
         when(userRepository.existsById(any(Integer.class))).thenReturn(true);
         when(itemRequestRepository.findByRequestorIdNot(any(Integer.class), any(Pageable.class))).thenReturn(page);
 
-        List<ItemRequestDtoWithItem> requests = itemRequestService.getAllRequestOtherUsers(userId, from, size);
+        List<ItemRequestDtoWithItem> requests = itemRequestService.getAllRequestOtherUsers(userId,
+                PageRequest.of(from / size, size, Sort.by("created")));
 
         assertTrue(requests.isEmpty(), "Список должен быть пустым");
         assertEquals(0, requests.size(), "Список должен содержать 0 элементов");

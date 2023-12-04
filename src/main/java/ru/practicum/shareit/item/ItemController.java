@@ -1,9 +1,13 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 /**
@@ -12,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
+@Validated
 public class ItemController {
 
     private final ItemService itemService;
@@ -35,16 +40,18 @@ public class ItemController {
 
     @GetMapping
     public List<ItemBookingDto> getItemsOwnerById(@RequestHeader("X-Sharer-User-Id") int userId,
-                                                  @RequestParam(name = "from", defaultValue = "0") int from,
-                                                  @RequestParam(name = "size", defaultValue = "30") int size) {
-        return itemService.getItemsOwnerById(userId, from, size);
+                                                  @RequestParam(name = "from", defaultValue = "0")
+                                                  @PositiveOrZero int from,
+                                                  @RequestParam(name = "size", defaultValue = "30")
+                                                  @Positive int size) {
+        return itemService.getItemsOwnerById(userId, PageRequest.of(from / size, size));
     }
 
     @GetMapping("/search")
     public List<ItemDto> getItemBySearch(@RequestHeader("X-Sharer-User-Id") int userId, @RequestParam String text,
-                                         @RequestParam(name = "from", defaultValue = "0") int from,
-                                         @RequestParam(name = "size", defaultValue = "30") int size) {
-        return itemService.getItemBySearch(userId, text, from, size);
+                                         @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero int from,
+                                         @RequestParam(name = "size", defaultValue = "30") @Positive int size) {
+        return itemService.getItemBySearch(userId, text, PageRequest.of(from / size, size));
     }
 
     @PostMapping("/{itemId}/comment")

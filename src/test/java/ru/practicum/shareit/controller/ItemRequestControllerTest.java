@@ -6,6 +6,8 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.item.ItemDtoForRequest;
@@ -102,7 +104,8 @@ public class ItemRequestControllerTest {
                 new ItemRequestDtoWithItem(3, "Запрос 3", LocalDateTime.now(), new ArrayList<>())
         );
 
-        Mockito.when(itemRequestService.getAllRequestOtherUsers(userId, from, size)).thenReturn(requests);
+        Mockito.when(itemRequestService.getAllRequestOtherUsers(userId, PageRequest.of(from / size, size,
+                Sort.by("created")))).thenReturn(requests);
 
         mockMvc.perform(get("/requests/all")
                         .header("X-Sharer-User-Id", String.valueOf(userId))
@@ -114,7 +117,8 @@ public class ItemRequestControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(requests)));
 
-        Mockito.verify(itemRequestService, Mockito.times(1)).getAllRequestOtherUsers(userId, from, size);
+        Mockito.verify(itemRequestService, Mockito.times(1))
+                .getAllRequestOtherUsers(userId, PageRequest.of(from / size, size, Sort.by("created")));
         Mockito.verifyNoMoreInteractions(itemRequestService);
     }
 

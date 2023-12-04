@@ -7,12 +7,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.exp.CommentException;
-import ru.practicum.shareit.exp.CountsException;
 import ru.practicum.shareit.exp.NonExistentItemException;
 import ru.practicum.shareit.item.*;
 import ru.practicum.shareit.request.ItemRequest;
@@ -227,33 +227,13 @@ public class ItemServiceTest {
     }
 
     @Test
-    void getItemBySearchFromNegativeTest() {
-        int userId = 1;
-        int from = -1;
-        int size = 5;
-        String text = "";
-
-        assertThrows(CountsException.class, () -> itemService.getItemBySearch(userId, text, from, size));
-    }
-
-    @Test
-    void getItemBySearchSizeNegativeAndFromNegativeTest() {
-        int userId = 1;
-        int from = -1;
-        int size = -1;
-        String text = "";
-
-        assertThrows(CountsException.class, () -> itemService.getItemBySearch(userId, text, from, size));
-    }
-
-    @Test
     void getItemBySearchBlankTest() {
         int userId = 1;
         int from = 1;
         int size = 5;
         String text = "";
 
-        List<ItemDto> items = itemService.getItemBySearch(userId, text, from, size);
+        List<ItemDto> items = itemService.getItemBySearch(userId, text, PageRequest.of(from / size, size));
         assertTrue(items.isEmpty(), "Список должен быть пустым");
         assertEquals(0, items.size(), "Список должен содержать 0 элементов");
     }
@@ -276,7 +256,7 @@ public class ItemServiceTest {
 
         when(itemRepository.search(eq(text), any(Pageable.class))).thenReturn(page);
 
-        List<ItemDto> items = itemService.getItemBySearch(userId, text, from, size);
+        List<ItemDto> items = itemService.getItemBySearch(userId, text, PageRequest.of(from / size, size));
 
         assertFalse(items.isEmpty(), "Список не должен быть пустым");
         assertEquals(listDto.size(), items.size(), "Размеры списков должны совпадать");

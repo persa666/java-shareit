@@ -1,5 +1,7 @@
 package ru.practicum.shareit.item;
 
+import org.springframework.data.domain.PageRequest;
+
 import java.util.List;
 
 public interface ItemService {
@@ -9,9 +11,9 @@ public interface ItemService {
 
     ItemBookingDto getItemById(int userId, int itemId);
 
-    List<ItemBookingDto> getItemsOwnerById(int userId, int from, int size);
+    List<ItemBookingDto> getItemsOwnerById(int userId, PageRequest pageRequest);
 
-    List<ItemDto> getItemBySearch(int userId, String text, int from, int size);
+    List<ItemDto> getItemBySearch(int userId, String text, PageRequest pageRequest);
 
     CommentDtoForSend createComment(int userId, CommentDto text, int itemId);
 }
