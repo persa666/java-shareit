@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.BookingServiceImpl;
@@ -47,6 +48,7 @@ public class BookingServiceTest {
     @InjectMocks
     private BookingServiceImpl bookingService;
 
+    @Transactional
     @Test
     void createBookingExceptionTest() {
         BookingDto bookingDto = new BookingDto(5, LocalDateTime.now(), LocalDateTime.now().plusDays(1));
@@ -57,6 +59,7 @@ public class BookingServiceTest {
         verifyNoInteractions(bookingRepository);
     }
 
+    @Transactional
     @Test
     void createBookingExceptionDateTest() {
         BookingDto bookingDto = new BookingDto(5, LocalDateTime.now(), LocalDateTime.now().minusDays(5));
@@ -68,6 +71,7 @@ public class BookingServiceTest {
         verifyNoInteractions(bookingRepository);
     }
 
+    @Transactional
     @Test
     void createBookingExistentUserTest() {
         BookingDto bookingDto = new BookingDto(5, LocalDateTime.now(), LocalDateTime.now().plusDays(1));
@@ -84,6 +88,7 @@ public class BookingServiceTest {
         verifyNoInteractions(bookingRepository);
     }
 
+    @Transactional
     @Test
     void createBookingExistentAvailableTest() {
         BookingDto bookingDto = new BookingDto(5, LocalDateTime.now(), LocalDateTime.now().plusDays(1));
@@ -101,6 +106,7 @@ public class BookingServiceTest {
         verifyNoInteractions(bookingRepository);
     }
 
+    @Transactional
     @Test
     void createBookingUserExceptionTest() {
         BookingDto bookingDto = new BookingDto(5, LocalDateTime.now(), LocalDateTime.now().plusDays(1));
@@ -121,6 +127,7 @@ public class BookingServiceTest {
         verifyNoInteractions(bookingRepository);
     }
 
+    @Transactional
     @Test
     void createBookingTest() {
         BookingDto bookingDto = new BookingDto(5, LocalDateTime.now(), LocalDateTime.now().plusDays(1));
@@ -153,6 +160,7 @@ public class BookingServiceTest {
         verify(bookingRepository, times(1)).save(any(Booking.class));
     }
 
+    @Transactional
     @Test
     void replaceBookingExceptionTest() {
         int userId = 1;
@@ -168,6 +176,7 @@ public class BookingServiceTest {
         verifyNoMoreInteractions(bookingRepository);
     }
 
+    @Transactional
     @Test
     void replaceBookingNotOwnerTest() {
         int userId = 1;
@@ -180,6 +189,7 @@ public class BookingServiceTest {
         verify(bookingRepository, times(1)).updateStatusByBookingId(userId, Status.REJECTED, bookingId);
     }
 
+    @Transactional
     @Test
     void replaceBookingNonExistentUserTest() {
         int userId = 1;
@@ -192,6 +202,7 @@ public class BookingServiceTest {
         verify(bookingRepository, times(1)).updateStatusByBookingId(userId, Status.APPROVED, bookingId);
     }
 
+    @Transactional
     @Test
     void replaceBookingTest() {
         int userId = 1;
@@ -220,6 +231,7 @@ public class BookingServiceTest {
         verify(bookingRepository, times(1)).findById(any(Integer.class));
     }
 
+    @Transactional
     @Test
     void replaceBookingNonExistentBookingExceptionTest() {
         int userId = 1;
@@ -244,6 +256,7 @@ public class BookingServiceTest {
                 .updateStatusByBookingId(userId, Status.APPROVED, bookingId);
     }
 
+    @Transactional
     @Test
     void findBookingsByUserIdNonExistentUserExceptionTest() {
         int userId = 1;
@@ -256,6 +269,7 @@ public class BookingServiceTest {
                 () -> bookingService.findBookingsByUserId(userId, state, PageRequest.of(from / size, size)));
     }
 
+    @Transactional
     @Test
     void findBookingsByUserIdAllTest() {
         int userId = 1;
@@ -278,6 +292,7 @@ public class BookingServiceTest {
         verify(bookingRepository, times(1)).findByBookerIdOrderByStartDesc(userId, PageRequest.of(from, size));
     }
 
+    @Transactional
     @Test
     void findBookingsByUserIdCurrentTest() {
         int userId = 1;
@@ -300,6 +315,7 @@ public class BookingServiceTest {
         verify(userRepository, times(1)).countUserById(userId);
     }
 
+    @Transactional
     @Test
     void findBookingsByUserIdPastTest() {
         int userId = 1;
@@ -321,6 +337,7 @@ public class BookingServiceTest {
         verify(userRepository, times(1)).countUserById(userId);
     }
 
+    @Transactional
     @Test
     void findBookingsByUserIdFutureTest() {
         int userId = 1;
@@ -342,6 +359,7 @@ public class BookingServiceTest {
         verify(userRepository, times(1)).countUserById(userId);
     }
 
+    @Transactional
     @Test
     void findBookingsByUserIdWaitingTest() {
         int userId = 1;
@@ -363,6 +381,7 @@ public class BookingServiceTest {
         verify(userRepository, times(1)).countUserById(userId);
     }
 
+    @Transactional
     @Test
     void findBookingsByUserIdRejectedTest() {
         int userId = 1;
@@ -384,6 +403,7 @@ public class BookingServiceTest {
         verify(userRepository, times(1)).countUserById(userId);
     }
 
+    @Transactional
     @Test
     void findBookingsByUserIdNotCorrectlyTest() {
         int userId = 1;
@@ -398,6 +418,7 @@ public class BookingServiceTest {
         verify(userRepository, times(1)).countUserById(userId);
     }
 
+    @Transactional
     @Test
     void findBookingForItemsByUserNonExistentIdTest() {
         int userId = 1;
@@ -410,6 +431,7 @@ public class BookingServiceTest {
                 () -> bookingService.findBookingForItemsByUserId(userId, state, PageRequest.of(from / size, size)));
     }
 
+    @Transactional
     @Test
     void findBookingForItemsByUserIdAllTest() {
         int userId = 1;
@@ -432,6 +454,7 @@ public class BookingServiceTest {
         verify(bookingRepository, times(1)).findByItemOwnerIdOrderByStartDesc(userId, PageRequest.of(from, size));
     }
 
+    @Transactional
     @Test
     void findBookingForItemsByUserIdCurrentTest() {
         int userId = 1;
@@ -454,6 +477,7 @@ public class BookingServiceTest {
         verify(userRepository, times(1)).countUserById(userId);
     }
 
+    @Transactional
     @Test
     void findBookingForItemsByUserIdPastTest() {
         int userId = 1;
@@ -475,6 +499,7 @@ public class BookingServiceTest {
         verify(userRepository, times(1)).countUserById(userId);
     }
 
+    @Transactional
     @Test
     void findBookingForItemsByUserIdFutureTest() {
         int userId = 1;
@@ -496,6 +521,7 @@ public class BookingServiceTest {
         verify(userRepository, times(1)).countUserById(userId);
     }
 
+    @Transactional
     @Test
     void findBookingForItemsByUserIdWaitingTest() {
         int userId = 1;
@@ -517,6 +543,7 @@ public class BookingServiceTest {
         verify(userRepository, times(1)).countUserById(userId);
     }
 
+    @Transactional
     @Test
     void findBookingForItemsByUserIdRejectedTest() {
         int userId = 1;
@@ -538,6 +565,7 @@ public class BookingServiceTest {
         verify(userRepository, times(1)).countUserById(userId);
     }
 
+    @Transactional
     @Test
     void findBookingForItemsByUserIdNotCorrectlyTest() {
         int userId = 1;
@@ -551,5 +579,4 @@ public class BookingServiceTest {
 
         verify(userRepository, times(1)).countUserById(userId);
     }
-
 }

@@ -27,6 +27,7 @@ public class UserServiceIntegrationTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Transactional
     @Test
     public void testGetAllUsers() {
         User user1 = new User("John", "john@example.com");

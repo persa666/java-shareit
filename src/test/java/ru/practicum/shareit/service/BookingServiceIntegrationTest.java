@@ -40,6 +40,7 @@ public class BookingServiceIntegrationTest {
     @Autowired
     private BookingServiceImpl bookingService;
 
+    @Transactional
     @Test
     void findBookingById() {
         User user = new User("name", "asd@mail.com");

@@ -36,6 +36,7 @@ public class ItemRequestIntegrationTest {
     @Autowired
     private ItemRequestServiceImpl itemRequestService;
 
+    @Transactional
     @Test
     void getRequestByIdExceptionTest() {
         int userId = 1;
@@ -44,6 +45,7 @@ public class ItemRequestIntegrationTest {
                 .getRequestById(userId, requestId));
     }
 
+    @Transactional
     @Test
     void getRequestByIdTest() {
         User owner = new User("name", "asd@mail.com");

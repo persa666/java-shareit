@@ -46,6 +46,7 @@ public class ItemServiceIntegrationTest {
     @Autowired
     private ItemServiceImpl itemService;
 
+    @Transactional
     @Test
     void getItemsOwnerByIdTest() {
         int from = 0;
@@ -60,7 +61,6 @@ public class ItemServiceIntegrationTest {
         itemRequest.setDescription("des");
         itemRequest.setRequestor(booker);
         itemRequest.setCreated(LocalDateTime.now());
-        CommentDto commentDto = new CommentDto("text");
 
         itemRequest = itemRequestRepository.save(itemRequest);
         ItemDtoForRequest itemDtoForRequest = new ItemDtoForRequest();

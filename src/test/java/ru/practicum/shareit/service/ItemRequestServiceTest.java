@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exp.NonExistentUserException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemRepository;
@@ -42,6 +43,7 @@ public class ItemRequestServiceTest {
     @InjectMocks
     private ItemRequestServiceImpl itemRequestService;
 
+    @Transactional
     @Test
     void createRequestTest() {
         int userId = 1;
@@ -64,6 +66,7 @@ public class ItemRequestServiceTest {
         Mockito.verify(itemRequestRepository, Mockito.times(1)).save(any(ItemRequest.class));
     }
 
+    @Transactional
     @Test
     void getAllRequestsUserExceptionTest() {
         int userId = 1;
@@ -74,6 +77,7 @@ public class ItemRequestServiceTest {
         Mockito.verify(userRepository, Mockito.times(1)).existsById(userId);
     }
 
+    @Transactional
     @Test
     void getAllRequestsUserTest() {
         int userId = 1;
@@ -96,6 +100,7 @@ public class ItemRequestServiceTest {
         Mockito.verify(itemRequestRepository, Mockito.times(1)).findByRequestorId(userId);
     }
 
+    @Transactional
     @Test
     void getAllRequestOtherUsersExceptionTest() {
         int userId = 1;
@@ -110,6 +115,7 @@ public class ItemRequestServiceTest {
         Mockito.verify(userRepository, Mockito.times(1)).existsById(userId);
     }
 
+    @Transactional
     @Test
     void getAllRequestOtherUsersTest() {
         int userId = 1;

@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exp.EmailExistsException;
 import ru.practicum.shareit.exp.NonExistentUserException;
 import ru.practicum.shareit.user.User;
@@ -27,6 +28,7 @@ public class UserServiceTest {
     @InjectMocks
     private UserServiceImpl userService;
 
+    @Transactional
     @Test
     void deleteUserTest() {
         int userId = 1;
@@ -37,6 +39,7 @@ public class UserServiceTest {
         Mockito.verifyNoMoreInteractions(userRepository);
     }
 
+    @Transactional
     @Test
     void createUserSuccessTest() {
         UserDto userDto = new UserDto(1, "John Doe", "john.doe@example.com");
@@ -55,6 +58,7 @@ public class UserServiceTest {
         Mockito.verifyNoMoreInteractions(userRepository);
     }
 
+    @Transactional
     @Test
     void createUserNotSuccessTest() {
         UserDto userDto = new UserDto(1, "Existing User", "existing.email@example.com");
@@ -72,6 +76,7 @@ public class UserServiceTest {
         Mockito.verifyNoMoreInteractions(userRepository);
     }
 
+    @Transactional
     @Test
     void replaceUserUpdateNameSuccessTest() {
         int userId = 1;
@@ -92,6 +97,7 @@ public class UserServiceTest {
         Mockito.verifyNoMoreInteractions(userRepository);
     }
 
+    @Transactional
     @Test
     void replaceUserUpdateEmailSuccessTest() {
         int userId = 1;
@@ -112,6 +118,7 @@ public class UserServiceTest {
         Mockito.verifyNoMoreInteractions(userRepository);
     }
 
+    @Transactional
     @Test
     void replaceUserUpdateNameAndEmailSuccessTest() {
         int userId = 1;
@@ -129,6 +136,7 @@ public class UserServiceTest {
                 Mockito.eq("new.email@example.com"), Mockito.eq(userId));
     }
 
+    @Transactional
     @Test
     void getUserByIdSuccessTest() {
         int userId = 1;
@@ -145,6 +153,7 @@ public class UserServiceTest {
         Mockito.verify(userRepository).findById(userId);
     }
 
+    @Transactional
     @Test
     void getUserByIdNonExistentUserTest() {
         int userId = 1;
@@ -160,6 +169,7 @@ public class UserServiceTest {
         Mockito.verify(userRepository).findById(userId);
     }
 
+    @Transactional
     @Test
     void replaceUserNonExistentUserTest() {
         int userId = 1;

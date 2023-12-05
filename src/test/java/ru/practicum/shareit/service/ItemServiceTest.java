@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.Status;
@@ -49,6 +50,7 @@ public class ItemServiceTest {
     @InjectMocks
     private ItemServiceImpl itemService;
 
+    @Transactional
     @Test
     void createItemTest() {
         ItemDtoForRequest itemDtoForRequest = new ItemDtoForRequest();
@@ -79,6 +81,7 @@ public class ItemServiceTest {
         verify(itemRepository, times(1)).save(any(Item.class));
     }
 
+    @Transactional
     @Test
     void createItemNotSuccessTest() {
         ItemDtoForRequest itemDtoForRequest = new ItemDtoForRequest();
@@ -103,6 +106,7 @@ public class ItemServiceTest {
         verify(itemRepository, times(0)).save(any(Item.class));
     }
 
+    @Transactional
     @Test
     void replaceItemTest() {
         ItemDto itemDto = new ItemDto();
@@ -137,6 +141,7 @@ public class ItemServiceTest {
         verify(itemRepository, times(1)).save(any(Item.class));
     }
 
+    @Transactional
     @Test
     void replaceItemWithNonExistentItemTest() {
         ItemDto itemDto = new ItemDto();
@@ -151,6 +156,7 @@ public class ItemServiceTest {
         verify(itemRepository, times(0)).save(any(Item.class));
     }
 
+    @Transactional
     @Test
     void replaceItemWithNonExistentUserTest() {
         ItemDto itemDto = new ItemDto();
@@ -177,6 +183,7 @@ public class ItemServiceTest {
         verify(itemRepository, times(0)).save(any(Item.class));
     }
 
+    @Transactional
     @Test
     void getItemByIdExceptionTest() {
         int userId = 1;
@@ -192,6 +199,7 @@ public class ItemServiceTest {
         verify(itemRepository, times(1)).findById(itemId);
     }
 
+    @Transactional
     @Test
     void getItemByIdSuccessTest() {
         int userId = 1;
@@ -226,6 +234,7 @@ public class ItemServiceTest {
         verify(itemRepository, times(1)).save(any(Item.class));
     }
 
+    @Transactional
     @Test
     void getItemBySearchBlankTest() {
         int userId = 1;
@@ -238,6 +247,7 @@ public class ItemServiceTest {
         assertEquals(0, items.size(), "Список должен содержать 0 элементов");
     }
 
+    @Transactional
     @Test
     void getItemBySearchTest() {
         int userId = 1;
@@ -276,6 +286,7 @@ public class ItemServiceTest {
         }
     }
 
+    @Transactional
     @Test
     void createCommentExceptionTest() {
         int count = 0;
@@ -289,6 +300,7 @@ public class ItemServiceTest {
         assertThrows(CommentException.class, () -> itemService.createComment(userId, commentDto, itemId));
     }
 
+    @Transactional
     @Test
     void createCommentTest() {
         int count = 1;
