@@ -1,11 +1,15 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoForSend;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import javax.websocket.server.PathParam;
 import java.util.List;
 
@@ -15,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
+@Validated
 public class BookingController {
     private final BookingService bookingService;
 
@@ -39,14 +44,22 @@ public class BookingController {
 
     @GetMapping
     List<BookingDtoForSend> findBookingsByUserId(@RequestHeader("X-Sharer-User-Id") int userId,
-                                                 @RequestParam(required = false, defaultValue = "ALL") String state) {
-        return bookingService.findBookingsByUserId(userId, state);
+                                                 @RequestParam(required = false, defaultValue = "ALL") String state,
+                                                 @RequestParam(name = "from", defaultValue = "0")
+                                                 @PositiveOrZero int from,
+                                                 @RequestParam(name = "size", defaultValue = "30")
+                                                 @Positive int size) {
+        return bookingService.findBookingsByUserId(userId, state, PageRequest.of(from / size, size));
     }
 
     @GetMapping("/owner")
     List<BookingDtoForSend> findBookingForItemsByUserId(@RequestHeader("X-Sharer-User-Id") int userId,
                                                         @RequestParam(required = false,
-                                                                defaultValue = "ALL") String state) {
-        return bookingService.findBookingForItemsByUserId(userId, state);
+                                                                defaultValue = "ALL") String state,
+                                                        @RequestParam(name = "from", defaultValue = "0")
+                                                        @PositiveOrZero int from,
+                                                        @RequestParam(name = "size", defaultValue = "30")
+                                                        @Positive int size) {
+        return bookingService.findBookingForItemsByUserId(userId, state, PageRequest.of(from / size, size));
     }
 }

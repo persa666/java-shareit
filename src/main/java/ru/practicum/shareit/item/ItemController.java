@@ -1,9 +1,13 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 /**
@@ -12,13 +16,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
+@Validated
 public class ItemController {
 
     private final ItemService itemService;
 
     @PostMapping
-    public ItemDto createItem(@RequestBody @Valid ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") int userId) {
-        return itemService.createItem(itemDto, userId);
+    public ItemDtoForRequest createItem(@RequestBody @Valid ItemDtoForRequest itemDtoForRequest,
+                                        @RequestHeader("X-Sharer-User-Id") int userId) {
+        return itemService.createItem(itemDtoForRequest, userId);
     }
 
     @PatchMapping("/{itemId}")
@@ -33,13 +39,19 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemBookingDto> getItemsOwnerById(@RequestHeader("X-Sharer-User-Id") int userId) {
-        return itemService.getItemsOwnerById(userId);
+    public List<ItemBookingDto> getItemsOwnerById(@RequestHeader("X-Sharer-User-Id") int userId,
+                                                  @RequestParam(name = "from", defaultValue = "0")
+                                                  @PositiveOrZero int from,
+                                                  @RequestParam(name = "size", defaultValue = "30")
+                                                  @Positive int size) {
+        return itemService.getItemsOwnerById(userId, PageRequest.of(from / size, size));
     }
 
     @GetMapping("/search")
-    public List<ItemDto> getItemBySearch(@RequestHeader("X-Sharer-User-Id") int userId, @RequestParam String text) {
-        return itemService.getItemBySearch(userId, text);
+    public List<ItemDto> getItemBySearch(@RequestHeader("X-Sharer-User-Id") int userId, @RequestParam String text,
+                                         @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero int from,
+                                         @RequestParam(name = "size", defaultValue = "30") @Positive int size) {
+        return itemService.getItemBySearch(userId, text, PageRequest.of(from / size, size));
     }
 
     @PostMapping("/{itemId}/comment")

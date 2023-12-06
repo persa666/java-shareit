@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking;
 
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoForSend;
 
@@ -12,7 +13,7 @@ public interface BookingService {
 
     BookingDtoForSend findBookingById(int userId, int bookingId);
 
-    List<BookingDtoForSend> findBookingsByUserId(int userId, String state);
+    List<BookingDtoForSend> findBookingsByUserId(int userId, String state, PageRequest pageRequest);
 
-    List<BookingDtoForSend> findBookingForItemsByUserId(int userId, String state);
+    List<BookingDtoForSend> findBookingForItemsByUserId(int userId, String state, PageRequest pageRequest);
 }

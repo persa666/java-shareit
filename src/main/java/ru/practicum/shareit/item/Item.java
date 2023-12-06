@@ -47,4 +47,12 @@ public class Item {
         this.available = available;
         this.request = request;
     }
+
+    public Integer getRequestIdOrNull() {
+        if (request != null) {
+            return request.getId();
+        } else {
+            return null;
+        }
+    }
 }

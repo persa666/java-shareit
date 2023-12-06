@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoForSend;
@@ -79,43 +80,45 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoForSend> findBookingsByUserId(int userId, String state) {
+    public List<BookingDtoForSend> findBookingsByUserId(int userId, String state, PageRequest pageRequest) {
         if (userRepository.countUserById(userId) <= 0) {
             throw new NonExistentUserException("Пользователя с таким id нет.");
         }
         switch (state) {
             case "ALL": {
-                return bookingRepository.findByBookerIdOrderByStartDesc(userId)
+                return bookingRepository.findByBookerIdOrderByStartDesc(userId, pageRequest)
                         .stream()
                         .map(BookingMapper::toBookingForSend)
                         .collect(Collectors.toList());
             }
             case "CURRENT": {
                 return bookingRepository.findByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId,
-                                LocalDateTime.now(), LocalDateTime.now())
+                                LocalDateTime.now(), LocalDateTime.now(), pageRequest)
                         .stream()
                         .map(BookingMapper::toBookingForSend)
                         .collect(Collectors.toList());
             }
             case "PAST": {
-                return bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now())
+                return bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now(),
+                                pageRequest)
                         .stream()
                         .map(BookingMapper::toBookingForSend)
                         .collect(Collectors.toList());
             }
             case "FUTURE": {
-                return bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now())
+                return bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now(),
+                                pageRequest)
                         .stream()
                         .map(BookingMapper::toBookingForSend)
                         .collect(Collectors.toList());
             }
             case "WAITING":
-                return bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING)
+                return bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING, pageRequest)
                         .stream()
                         .map(BookingMapper::toBookingForSend)
                         .collect(Collectors.toList());
             case "REJECTED": {
-                return bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, Status.REJECTED)
+                return bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, Status.REJECTED, pageRequest)
                         .stream()
                         .map(BookingMapper::toBookingForSend)
                         .collect(Collectors.toList());
@@ -123,46 +126,51 @@ public class BookingServiceImpl implements BookingService {
             default: {
                 throw new StatusException("Статус бронирования неверный");
             }
-
         }
     }
 
     @Override
-    public List<BookingDtoForSend> findBookingForItemsByUserId(int userId, String state) {
+    public List<BookingDtoForSend> findBookingForItemsByUserId(int userId, String state, PageRequest pageRequest) {
         if (userRepository.countUserById(userId) <= 0) {
             throw new NonExistentUserException("Пользователя с таким id нет.");
         }
         switch (state) {
             case "ALL": {
-                return bookingRepository.findByItemOwnerIdOrderByStartDesc(userId).stream()
+                return bookingRepository.findByItemOwnerIdOrderByStartDesc(userId, pageRequest)
+                        .stream()
                         .map(BookingMapper::toBookingForSend)
                         .collect(Collectors.toList());
             }
             case "CURRENT": {
                 return bookingRepository.findByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId,
-                                LocalDateTime.now(), LocalDateTime.now()).stream()
+                                LocalDateTime.now(), LocalDateTime.now(), pageRequest)
+                        .stream()
                         .map(BookingMapper::toBookingForSend)
                         .collect(Collectors.toList());
             }
             case "PAST": {
-                return bookingRepository.findByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now())
+                return bookingRepository.findByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now(),
+                                pageRequest)
                         .stream()
                         .map(BookingMapper::toBookingForSend)
                         .collect(Collectors.toList());
             }
             case "FUTURE": {
-                return bookingRepository.findByItemOwnerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now())
+                return bookingRepository.findByItemOwnerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now(),
+                                pageRequest)
                         .stream()
                         .map(BookingMapper::toBookingForSend)
                         .collect(Collectors.toList());
             }
             case "WAITING":
-                return bookingRepository.findByItemOwnerIdAndStatus(userId, Status.WAITING)
+                return bookingRepository
+                        .findByItemOwnerIdAndStatus(userId, Status.WAITING, pageRequest)
                         .stream()
                         .map(BookingMapper::toBookingForSend)
                         .collect(Collectors.toList());
             case "REJECTED": {
-                return bookingRepository.findByItemOwnerIdAndStatus(userId, Status.REJECTED)
+                return bookingRepository
+                        .findByItemOwnerIdAndStatus(userId, Status.REJECTED, pageRequest)
                         .stream()
                         .map(BookingMapper::toBookingForSend)
                         .collect(Collectors.toList());
