@@ -4,20 +4,21 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.BookingServiceImpl;
 import ru.practicum.shareit.booking.Status;
-import ru.practicum.shareit.item.*;
-import ru.practicum.shareit.request.ItemRequest;
-import ru.practicum.shareit.request.ItemRequestRepository;
+import ru.practicum.shareit.booking.dto.BookingDtoForSend;
+import ru.practicum.shareit.item.Item;
+import ru.practicum.shareit.item.ItemDtoForRequest;
+import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -26,7 +27,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @Rollback
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @SpringBootTest(properties = {"db.name = h2"})
-public class ItemServiceIntegrationTest {
+public class BookingServiceIntegrationTest {
+    @Autowired
+    private BookingRepository bookingRepository;
 
     @Autowired
     private ItemRepository itemRepository;
@@ -35,42 +38,25 @@ public class ItemServiceIntegrationTest {
     private UserRepository userRepository;
 
     @Autowired
-    private BookingRepository bookingRepository;
-
-    @Autowired
-    private CommentRepository commentRepository;
-
-    @Autowired
-    private ItemRequestRepository itemRequestRepository;
-
-    @Autowired
-    private ItemServiceImpl itemService;
+    private BookingServiceImpl bookingService;
 
     @Transactional
     @Test
-    void getItemsOwnerByIdTest() {
-        int from = 0;
-        int size = 1;
+    void findBookingById() {
         User user = new User("name", "asd@mail.com");
         user = userRepository.save(user);
         User booker = new User("booker", "123@mail.com");
         booker = userRepository.save(booker);
         User nextBooker = new User("booker2", "1234@mail.com");
         nextBooker = userRepository.save(nextBooker);
-        ItemRequest itemRequest = new ItemRequest();
-        itemRequest.setDescription("des");
-        itemRequest.setRequestor(booker);
-        itemRequest.setCreated(LocalDateTime.now());
 
-        itemRequest = itemRequestRepository.save(itemRequest);
         ItemDtoForRequest itemDtoForRequest = new ItemDtoForRequest();
         itemDtoForRequest.setName("name");
         itemDtoForRequest.setDescription("desc");
         itemDtoForRequest.setAvailable(true);
-        itemDtoForRequest.setRequestId(itemRequest.getId());
         Item item = ItemMapper.toItem(itemDtoForRequest);
         item.setOwner(user);
-        item.setRequest(itemRequest);
+        item.setRequest(null);
         item = itemRepository.save(item);
 
         Booking booking = new Booking();
@@ -81,28 +67,22 @@ public class ItemServiceIntegrationTest {
         booking.setBooker(booker);
         booking.setStatus(Status.APPROVED);
 
-        Booking nextBooking = new Booking();
-        nextBooking.setId(2);
-        nextBooking.setStart(LocalDateTime.now().plusDays(1));
-        nextBooking.setEnd(LocalDateTime.now().plusDays(2));
-        nextBooking.setItem(item);
-        nextBooking.setBooker(nextBooker);
-        nextBooking.setStatus(Status.APPROVED);
-
-        itemService.createItem(itemDtoForRequest, user.getId());
         booking = bookingRepository.save(booking);
-        nextBooking = bookingRepository.save(nextBooking);
-        List<ItemBookingDto> list = itemService.getItemsOwnerById(user.getId(), PageRequest.of(from / size, size));
 
-        assertNotNull(list, "Список не должен быть null");
-        assertEquals(1, list.size(), "Размер списка должен быть равен 1");
+        BookingDtoForSend foundBooking = bookingService.findBookingById(booker.getId(), booking.getId());
+
+        assertNotNull(foundBooking, "Найденное бронирование не должно быть null");
+
+        assertEquals(booking.getId(),
+                foundBooking.getId(), "ID бронирования должен соответствовать ожидаемому значению");
+        assertEquals(booking.getStatus(),
+                foundBooking.getStatus(), "Статус бронирования должен соответствовать ожидаемому значению");
 
         bookingRepository.delete(booking);
-        bookingRepository.delete(nextBooking);
-        itemRequestRepository.delete(itemRequest);
         itemRepository.delete(item);
         userRepository.delete(nextBooker);
         userRepository.delete(booker);
         userRepository.delete(user);
+
     }
 }
