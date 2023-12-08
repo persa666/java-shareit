@@ -45,5 +45,8 @@ public class UserServiceIntegrationTest {
         assertEquals("john@example.com", userDtos.get(0).getEmail());
         assertEquals("Jane", userDtos.get(1).getName());
         assertEquals("jane@example.com", userDtos.get(1).getEmail());
+
+        userRepository.delete(user2);
+        userRepository.delete(user1);
     }
 }
