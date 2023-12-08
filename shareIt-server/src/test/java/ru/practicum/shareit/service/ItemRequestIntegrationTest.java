@@ -65,8 +65,5 @@ public class ItemRequestIntegrationTest {
         assertEquals("desc", resultItemRequest.getDescription(), "Описание заявки должно совпадать");
         assertNotNull(resultItemRequest.getCreated(), "Дата создания не должна быть null");
 
-        itemRequestRepository.delete(itemRequest);
-        userRepository.delete(requestor);
-        userRepository.delete(owner);
     }
 }

@@ -78,11 +78,6 @@ public class BookingServiceIntegrationTest {
         assertEquals(booking.getStatus(),
                 foundBooking.getStatus(), "Статус бронирования должен соответствовать ожидаемому значению");
 
-        bookingRepository.delete(booking);
-        itemRepository.delete(item);
-        userRepository.delete(nextBooker);
-        userRepository.delete(booker);
-        userRepository.delete(user);
 
     }
 }
