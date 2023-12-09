@@ -46,9 +46,12 @@ public class ItemControllerGateway {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Object> getItemBySearch(@RequestHeader("X-Sharer-User-Id") int userId, @RequestParam String text,
-                                                  @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero int from,
-                                                  @RequestParam(name = "size", defaultValue = "30") @Positive int size) {
+    public ResponseEntity<Object> getItemBySearch(@RequestHeader("X-Sharer-User-Id") int userId,
+                                                  @RequestParam String text,
+                                                  @RequestParam(name = "from", defaultValue = "0")
+                                                  @PositiveOrZero int from,
+                                                  @RequestParam(name = "size", defaultValue = "30")
+                                                  @Positive int size) {
         return itemClient.getItemBySearch(userId, text, from, size);
     }
 

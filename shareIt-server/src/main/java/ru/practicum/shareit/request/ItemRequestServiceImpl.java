@@ -73,7 +73,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 .collect(Collectors.groupingBy(ItemDtoForRequest::getRequestId));
         return list.stream()
                 .peek(request -> {
-                    List<ItemDtoForRequest> associatedItems = itemsByRequestId.getOrDefault(request.getId(), Collections.emptyList());
+                    List<ItemDtoForRequest> associatedItems = itemsByRequestId.getOrDefault(request.getId(),
+                            Collections.emptyList());
                     request.setItems(associatedItems);
                 })
                 .collect(Collectors.toList());

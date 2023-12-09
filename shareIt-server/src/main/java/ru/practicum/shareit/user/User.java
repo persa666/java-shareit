@@ -6,12 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -24,12 +19,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @NotEmpty
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Email
-    @NotEmpty
     @Column(name = "email", nullable = false)
     private String email;
 

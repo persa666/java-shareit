@@ -8,9 +8,6 @@ import ru.practicum.user.dto.User;
 
 import java.time.LocalDateTime;
 
-/**
- * TODO Sprint add-item-requests.
- */
 @Getter
 @Setter
 @AllArgsConstructor
